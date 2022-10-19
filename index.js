@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+app.use(express.urlencoded({ extended: true }));
 const cors = require('cors')
 const port = 8080;
 const mongoose = require('mongoose');
@@ -11,21 +12,21 @@ app.use(express.static('public'))
 
 
 
+
+
+
+
 main().catch(err => console.log(err));
 
 async function main() {
-  app.get('/', (req, res) => {
-
-
-    if (!dbConnectionStatus) {
-      res.sendFile(__dirname + '/views/preindex.html')
-    } else {
-      res.sendFile(__dirname + '/views/index.html')
-    }
-  });
-
-
   let dbConnectionStatus = await mongoose.connect(`mongodb+srv://${process.env.UN}:${process.env.PW}@cluster0.aaqngpq.mongodb.net/exercisetracker`);
+
+
+
+
+  
+
+ 
   
 
 
@@ -37,30 +38,48 @@ async function main() {
       description: String,
       duration: {
         type     : Number,
-        required : true,
+        required : false,
         unique   : false,
         validate : {
           // Pretty sure the Number below is not the same as the Number of type:
           validator : Number.isInteger,
           message   : '{VALUE} is not an integer value'
         }
+      },
+      date: {
+        type : Date,
+        required: false,
+        unique: false
       }
     }] 
   });
 
   const User = mongoose.model('User', userSchema);
 
-  const silence = new User({name: "Silence"});
-
-  await silence.save();
   
 
 
+  
+  app.get('/', (req, res) => {
+
+
+    if (!dbConnectionStatus) {
+      res.sendFile(__dirname + '/views/preindex.html')
+    } else {
+      res.sendFile(__dirname + '/views/index.html')
+    }
+  });
 
 
 
-  app.post('/api/shorturl', function (req, res) {
 
+
+  app.post('/api/users', function (req, res) {
+    const user = new User({name: req.body.username});
+
+
+
+    user.save();
   });
 }
 
