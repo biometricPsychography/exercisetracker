@@ -10,7 +10,11 @@ require('dotenv').config()
 app.use(cors())
 app.use(express.static('public'))
 
-
+app.use(function(req, res, next) {console.log(
+`req.method: ${req.method} 
+req.url: ${req.url} 
+req.body: ${JSON.stringify(req.body)}`
+); next();});
 
 
 
@@ -81,6 +85,29 @@ async function main() {
 
     user.save();
   });
+
+  // app.post('/api/users/:_id/logs?', function (req, res) {
+    
+
+
+  //   User.findById(req.params._id, (err, result) => {
+  //     console.log(result);
+  //     res.send('<code>'+result+'<code>')
+  //   });
+  // });
+
+  app.get('/api/users/:_id/logs?', function (req, res) {
+    
+
+
+    User.findById(req.params._id, (err, result) => {
+      console.log(result);
+      res.send('<code>'+result+'<code>')
+    });
+  });
+
+
+
 }
 
 
