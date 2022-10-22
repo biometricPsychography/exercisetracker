@@ -37,7 +37,7 @@ async function main() {
 
 
   const userSchema = new mongoose.Schema({
-    name: String,
+    username: String,
     exercises: [{
       description: String,
       duration: {
@@ -79,22 +79,28 @@ async function main() {
 
 
   app.post('/api/users', function (req, res) {
-    const user = new User({name: req.body.username});
+    const user = new User({username: req.body.username});
 
 
 
-    user.save();
+    user.save().then((savedDoc) => {
+      // instantly executed anonymous function using object destructuring inside .send()
+      res.send((({ _id, username }) => ({ _id, username }))(savedDoc));
+      
+    });
   });
 
-  // app.post('/api/users/:_id/logs?', function (req, res) {
+  app.post('/api/users/:_id/exercises', function (req, res) {
     
 
 
-  //   User.findById(req.params._id, (err, result) => {
-  //     console.log(result);
-  //     res.send('<code>'+result+'<code>')
-  //   });
-  // });
+    User.findById(req.params._id, (err, doc) => {
+      console.log(req.params)
+      doc.exercises.push({description: req.params.description});
+      console.log(doc);
+      res.send(doc);
+    });
+  });
 
   app.get('/api/users/:_id/logs?', function (req, res) {
     
@@ -102,7 +108,7 @@ async function main() {
 
     User.findById(req.params._id, (err, result) => {
       console.log(result);
-      res.send('<code>'+result+'<code>')
+      res.send('<code>'+result+'<code>');
     });
   });
 
