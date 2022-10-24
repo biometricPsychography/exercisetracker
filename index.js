@@ -37,12 +37,18 @@ async function main() {
 
 
   const userSchema = new mongoose.Schema({
-    username: String,
+    username: {
+      type: String,
+      required: true
+    },
     exercises: [{
-      description: String,
+      description: {
+        type: String,
+        required: true
+      },
       duration: {
         type     : Number,
-        required : false,
+        required : true,
         unique   : false,
         validate : {
           // Pretty sure the Number below is not the same as the Number of type:
@@ -84,9 +90,17 @@ async function main() {
 
 
     user.save().then((savedDoc) => {
-      // instantly executed anonymous function using object destructuring inside .send()
+      // instantly executed anonymous function using object destructuring inside .send() to filter object properties
       res.send((({ _id, username }) => ({ _id, username }))(savedDoc));
       
+    }, (err) => {
+      res.send(err);
+    });
+  });
+
+  app.get('/api/users', (req, res) => {
+    User.find({}).select('username').exec( (err, doc) => {
+      res.send(doc);
     });
   });
 
@@ -95,10 +109,20 @@ async function main() {
 
 
     User.findById(req.params._id, (err, doc) => {
-      console.log(req.params)
-      doc.exercises.push({description: req.params.description});
-      console.log(doc);
-      res.send(doc);
+      if (err) {res.send(err); return;}
+      let datePieces = req.body.date.split('-')
+      let date = new Date(datePieces[0], datePieces[1]-1, datePieces[2])
+
+      doc.exercises.push({description: req.body.description, duration: req.body.duration, date: date});
+      doc.save().then((doc) => {
+        let apiOutputScaffold = Object.assign({}, req.body);
+      apiOutputScaffold.username = doc.username;
+      console.log(apiOutputScaffold);
+      res.send(apiOutputScaffold);
+      }, (err) => {
+        res.send(err);
+      })
+      
     });
   });
 
@@ -106,9 +130,9 @@ async function main() {
     
 
 
-    User.findById(req.params._id, (err, result) => {
-      console.log(result);
-      res.send('<code>'+result+'<code>');
+    User.findById(req.params._id, (err, doc) => {
+      let apiOutputScaffold = (({ _id, username }) => ({ _id, username }))(doc)
+      res.send(doc);
     });
   });
 
