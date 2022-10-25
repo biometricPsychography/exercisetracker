@@ -126,8 +126,12 @@ async function main() {
     });
   });
 
-  app.get('/api/users/:_id/logs?', function (req, res) {
-    
+  app.get('/api/users/:_id/logs', function (req, res) {
+    let from = req.query.from;
+    let to = req.query.to;
+    let limit = req.query.limit;
+
+    console.log(from, to, limit)
 
 
     User.findById(req.params._id, (err, doc) => {
