@@ -135,8 +135,17 @@ async function main() {
 
 
     User.findById(req.params._id, (err, doc) => {
-      let apiOutputScaffold = (({ _id, username }) => ({ _id, username }))(doc)
-      res.send(doc);
+      let apiOutputScaffold = (({ _id, username }) => ({ _id, username }))(doc);
+      exerciseArr = [];
+      
+      doc.exercises.forEach((element, index, arr) => {
+        exerciseArr.push(element);
+      })
+
+      apiOutputScaffold.count = exerciseArr.length;
+
+      apiOutputScaffold.log = exerciseArr;
+      res.send(apiOutputScaffold);
     });
   });
 
