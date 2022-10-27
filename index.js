@@ -4,6 +4,7 @@ app.use(express.urlencoded({ extended: true }));
 const cors = require('cors')
 const port = 8080;
 const mongoose = require('mongoose');
+const e = require('express');
 require('dotenv').config()
 
 
@@ -138,8 +139,12 @@ async function main() {
       let apiOutputScaffold = (({ _id, username }) => ({ _id, username }))(doc);
       exerciseArr = [];
       
-      doc.exercises.forEach((element, index, arr) => {
-        exerciseArr.push(element);
+      doc.exercises.forEach((embeddedDoc, index, arr) => {
+        
+        let plainOldJavascriptObject = embeddedDoc.toObject();
+        delete plainOldJavascriptObject._id;
+        console.log(plainOldJavascriptObject)
+        exerciseArr.push(plainOldJavascriptObject);
       })
 
       apiOutputScaffold.count = exerciseArr.length;
