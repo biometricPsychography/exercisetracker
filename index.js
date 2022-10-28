@@ -131,16 +131,29 @@ async function main() {
     let to = req.query.to;
     let limit = req.query.limit;
 
-    console.log(from, to, limit)
+
 
 
     User.findById(req.params._id, (err, doc) => {
       let apiOutputScaffold = (({ _id, username }) => ({ _id, username }))(doc);
       exerciseArr = [];
       
+      // ideally this filtering would be done in the DB but freeCodeCamp tutorial didn't teach enough
+      // for that to be practical to figure out right now. I've definitely tried. I know it 
+      // would involve something like using aggregate...
+      console.log(from);
       doc.exercises.forEach((element, index, arr) => {
+        if (/\d{4}-\d{1,2}-\d{1,2}/.test(from)) {
+          let fromPieces = from.split('-');
+          let fromDateObj = new Date(fromPieces[0], fromPieces[1], fromPieces[2])
+          console.log(fromDateObj);
+        }
+
+
         exerciseArr.push(element);
       })
+
+
 
       apiOutputScaffold.count = exerciseArr.length;
 
