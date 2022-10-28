@@ -4,6 +4,7 @@ app.use(express.urlencoded({ extended: true }));
 const cors = require('cors')
 const port = 8080;
 const mongoose = require('mongoose');
+const e = require('express');
 require('dotenv').config()
 
 
@@ -142,7 +143,7 @@ async function main() {
       // for that to be practical to figure out right now. I've definitely tried. I know it 
       // would involve something like using aggregate...
       console.log(from);
-      doc.exercises.forEach((element, index, arr) => {
+      doc.exercises.forEach((embeddedDoc, index, arr) => {
         if (/\d{4}-\d{1,2}-\d{1,2}/.test(from)) {
           let fromPieces = from.split('-');
           let fromDateObj = new Date(fromPieces[0], fromPieces[1], fromPieces[2])
@@ -150,7 +151,11 @@ async function main() {
         }
 
 
-        exerciseArr.push(element);
+        
+        let plainOldJavascriptObject = embeddedDoc.toObject();
+        delete plainOldJavascriptObject._id;
+        console.log(plainOldJavascriptObject)
+        exerciseArr.push(plainOldJavascriptObject);
       })
 
 
