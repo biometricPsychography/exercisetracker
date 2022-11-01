@@ -111,13 +111,18 @@ async function main() {
 
     User.findById(req.params._id, (err, doc) => {
       if (err) {res.send(err); return;}
-      let datePieces = req.body.date.split('-')
-      let date = new Date(datePieces[0], datePieces[1]-1, datePieces[2])
+      if (req.body.date) {
+        let datePieces = req.body.date.split('-')
+        var date = new Date(datePieces[0], datePieces[1]-1, datePieces[2])
+      } else {
+        var date = new Date();
+      }
 
       doc.exercises.push({description: req.body.description, duration: req.body.duration, date: date});
       doc.save().then((doc) => {
         let apiOutputScaffold = Object.assign({}, req.body);
       apiOutputScaffold.username = doc.username;
+      apiOutputScaffold.date = date.toDateString();
       console.log(apiOutputScaffold);
       res.send(apiOutputScaffold);
       }, (err) => {
@@ -138,24 +143,69 @@ async function main() {
     User.findById(req.params._id, (err, doc) => {
       let apiOutputScaffold = (({ _id, username }) => ({ _id, username }))(doc);
       exerciseArr = [];
+
+
+
       
+  
+
+      if (/\d{4}-\d{1,2}-\d{1,2}/.test(from)) {
+        let fromPieces = from.split('-');
+        var fromDateObj = new Date(fromPieces[0], fromPieces[1] - 1, fromPieces[2])
+      }
+
+      if (/\d{4}-\d{1,2}-\d{1,2}/.test(to)) {
+        let toPieces = to.split('-');
+        var toDateObj = new Date(toPieces[0], toPieces[1] - 1, toPieces[2])
+      }
+      console.log({toDateObj})
+
+
+      doc.exercises.every((embeddedDoc, index, arr) => {
+        
+        // stop iteration when limit is passed
+        if (limit && index + 1 > limit) {
+          return false;
+        }
+        
+        let plainOldJavascriptObject = embeddedDoc.toObject();
+
+
       // ideally this filtering would be done in the DB but freeCodeCamp tutorial didn't teach enough
       // for that to be practical to figure out right now. I've definitely tried. I know it 
       // would involve something like using aggregate...
-      console.log(from);
-      doc.exercises.forEach((embeddedDoc, index, arr) => {
-        if (/\d{4}-\d{1,2}-\d{1,2}/.test(from)) {
-          let fromPieces = from.split('-');
-          let fromDateObj = new Date(fromPieces[0], fromPieces[1], fromPieces[2])
-          console.log(fromDateObj);
+
+        var willIncludeDoc;
+
+   
+        if (fromDateObj && plainOldJavascriptObject.date >= fromDateObj) {
+          willIncludeDoc = true;
+        } else if (!fromDateObj) {
+          willIncludeDoc = true;
+        } else {
+          willIncludeDoc = false;
+        }
+
+        if (willIncludeDoc && toDateObj && plainOldJavascriptObject.date <= toDateObj) {
+          willIncludeDoc = true;
+          
+        } else if (willIncludeDoc && !toDateObj) {
+          willIncludeDoc = true;
+        } else {
+          willIncludeDoc = false;
+        }
+
+        if (willIncludeDoc) {
+          delete plainOldJavascriptObject._id;
+          plainOldJavascriptObject.date = plainOldJavascriptObject.date.toDateString();
+          exerciseArr.push(plainOldJavascriptObject);
+          console.log('wut'); 
         }
 
 
+        return true;
         
-        let plainOldJavascriptObject = embeddedDoc.toObject();
-        delete plainOldJavascriptObject._id;
-        console.log(plainOldJavascriptObject)
-        exerciseArr.push(plainOldJavascriptObject);
+
       })
 
 
