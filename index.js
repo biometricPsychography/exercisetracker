@@ -173,7 +173,7 @@ async function main() {
       doc.exercises.every((embeddedDoc, index, arr) => {
         
         // stop iteration when limit is passed
-        if (limit && index + 1 > limit) {
+        if (limit && exerciseArr.length >= limit) {
           return false;
         }
         
