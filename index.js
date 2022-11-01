@@ -167,7 +167,7 @@ async function main() {
         let toPieces = to.split('-');
         var toDateObj = new Date(toPieces[0], toPieces[1] - 1, toPieces[2])
       }
-      console.log({toDateObj})
+  
 
 
       doc.exercises.every((embeddedDoc, index, arr) => {
@@ -208,7 +208,6 @@ async function main() {
           delete plainOldJavascriptObject._id;
           plainOldJavascriptObject.date = plainOldJavascriptObject.date.toDateString();
           exerciseArr.push(plainOldJavascriptObject);
-          console.log('wut'); 
         }
 
 
@@ -222,6 +221,7 @@ async function main() {
       apiOutputScaffold.count = exerciseArr.length;
 
       apiOutputScaffold.log = exerciseArr;
+      console.log({apiOutputScaffold});
       res.send(apiOutputScaffold);
     });
   });
