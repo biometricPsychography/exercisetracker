@@ -121,10 +121,11 @@ async function main() {
       doc.exercises.push({description: req.body.description, duration: req.body.duration, date: date});
       doc.save().then((doc) => {
         let apiOutputScaffold = Object.assign({}, req.body);
-      apiOutputScaffold.username = doc.username;
-      apiOutputScaffold.date = date.toDateString();
-      console.log(apiOutputScaffold);
-      res.send(apiOutputScaffold);
+        apiOutputScaffold.duration = parseInt(apiOutputScaffold.duration);
+        apiOutputScaffold.username = doc.username;
+        apiOutputScaffold.date = date.toDateString();
+        console.log(apiOutputScaffold);
+        res.send(apiOutputScaffold);
       }, (err) => {
         res.send(err);
       })
