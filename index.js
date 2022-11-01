@@ -1,3 +1,5 @@
+// TODO: Handle entering invalid id in add exercises
+
 const express = require('express')
 const app = express()
 app.use(express.urlencoded({ extended: true }));
@@ -120,9 +122,15 @@ async function main() {
 
       doc.exercises.push({description: req.body.description, duration: req.body.duration, date: date});
       doc.save().then((doc) => {
-        let apiOutputScaffold = Object.assign({}, req.body);
+        let apiOutputScaffold = {
+          _id: doc._id, 
+          username: doc.username,
+          date,
+          duration: parseInt(req.body.duration),
+          description: req.body.description
+        };
         apiOutputScaffold.duration = parseInt(apiOutputScaffold.duration);
-        apiOutputScaffold.username = doc.username;
+        
         apiOutputScaffold.date = date.toDateString();
         console.log(apiOutputScaffold);
         res.send(apiOutputScaffold);
